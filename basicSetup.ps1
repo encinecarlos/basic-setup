@@ -1,30 +1,52 @@
-Write-Host "Iniciando instalação de componentes  básicos."
+Write-Host "Installing basic components."
 
-if(!(Get-Command wsl.exe -Error-Action SilentlyContinue)) {
-    Write-Host "wsl não esta instalado. Por Favor, instale-o primeiro"
+if(!(Get-Command -Name wsl)) {
+    Write-Host "Installing wsl..."
+    wsl.exe --install
     exit
 }
 
-if(!(Get-Command winget -Error-Action SilentlyContinue)) {
-    Write-Host "Winget não esta instalado. Por Favor, instale-o primeiro"
+if(!(Get-Command -Name winget)) {
+    Write-Host "Winget not installed. Please, intall winget first"
     exit
 }
 
-$vsVersion = Read-Host "Informe a versão desejada do Visual Studio:"
+$vsVersion = Read-Host "Visual studio Version"
 
 $vsPackage = "Microsoft.VisualStudio.$vsVersion.Community"
 
-Write-Host "Instalando wsl..."
-wsl.exe --install
+$apps = @(
+    @{name = "Microsoft.WindowsTerminal"}
+    @{name = "Microsoft.VisualStudioCode"}
+    @{name = "Git.Git"}
+    @{name = "Postman.Postman"}
+    @{name = "dbeaver.dbeaver"}
+    @{name = "Amazon.Kindle"}
+    @{name = "suse.RancherDesktop"}
+    @{name = "JanDeDobbeleer.OhMyPosh"}
+    @{name = $vsPackage}
+)
 
-Write-Host "Instalando pacotes..."
-winget install `
-    Microsoft.VisualStudioCode `
-    Git.Git `
-    Postman.Postman `
-    dbeaver.dbeaver `
-    Amazon.Kindle `
-    suse.RancherDesktop `
-    JanDeDobbeleer.OhMyPosh `
-    $vsPackage --accept-package-agreements --accept-source-agreements
+Write-Host "Installing packages..."
+foreach($app in $apps) {
+    $listApp = winget --list -q $app.name
 
+    if(![string]::Join("",$listApp).Contains($app.name)) {
+        Write-Host "Instalando:" $app.name
+
+        if($null -ne $app.source) {
+            winget install --id $app.name -e -s $app.source --accept-package-agreements
+        } else {
+            winget install --id $app.name -e --accept-package-agreements
+        }
+    } else {
+        Write-Host "Ignorar instalação do pacote " $app.name
+    }
+}
+# winget install --id Microsoft.VisualStudioCode
+# winget install --id Git.Git
+# winget install --id Postman.Postman
+# winget install --id dbeaver.dbeaver
+# winget install --id Amazon.Kindle
+# winget install --id suse.RancherDesktop
+# winget install --id $vsPackage

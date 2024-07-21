@@ -43,10 +43,3 @@ foreach($app in $apps) {
         Write-Host "Ignorar instalação do pacote " $app.name
     }
 }
-# winget install --id Microsoft.VisualStudioCode
-# winget install --id Git.Git
-# winget install --id Postman.Postman
-# winget install --id dbeaver.dbeaver
-# winget install --id Amazon.Kindle
-# winget install --id suse.RancherDesktop
-# winget install --id $vsPackage
